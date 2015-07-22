@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<!−−Example Simulations illustrating GEM Storage in Three Level Atom −−>
-<author>Originally written by G. Hetet and modified by M. Hosseini </author>
-<simulation xdms-version="1">
-<!−−Each xmds simulation is enclosed within a set of < simulation > tags −−>
+<!--Example Simulations illustrating GEM Storage in Three Level Atom-->
+<simulation>
+  <author>Originally written by G. Hetet and modified by M. Hosseini </author>
+<!--Each xmds simulation is enclosed within a set of < simulation > tags -->
 <error_check>yes</error_check>
-<!−−Optional. Whether or not to run the simulation at the half-time step as well as at
-the full time step and give the difference between the results. Defaults to yes −−>
+<!--Optional. Whether or not to run the simulation at the half-time step as well as at
+the full time step and give the difference between the results. Defaults to yes -->
 <prop_dim>z</prop_dim>
-<!−−The propagation dimension of the cross propagating vector−−>
-<!−−In the following part, globals are used to define any numerical constants that
-are useful to have globally available to all sections of code−−>
+<!--The propagation dimension of the cross propagating vector-->
+<!--In the following part, globals are used to define any numerical constants that
+are useful to have globally available to all sections of code-->
 <globals>
 <![CDATA[
 const double g = 1.0;
@@ -27,74 +27,72 @@ const double N = 5200;
 const double delta = 700.0;
 ]]>
 </globals>
-<!−−The following part is a container for the other information that we are using
+<!--The following part is a container for the other information that we are using
 to describe the field. If no name is given for the field, it defaults to "main". The vector is
 written in terms of the dimensions of the field. It is possible to define other vectors that
-are part of the field, but the vector of the field that is integrating is the main vector−−>
+are part of the field, but the vector of the field that is integrating is the main vector-->
 <field>
 <dimensions>t</dimensions>
 <lattice>12000</lattice>
 <domains>(0.0, 20.0)</domains>
 <samples> 1 1 </samples>
 <vector>
-<name> main </name>
+<name>main</name>
 <type> complex </type>
 <components> E </components>
-E = inp_hgt ∗ exp(−(t − time_input) ∗ (t − time_input)/(sigma ∗ sigma));
+E=inp_hgt*exp(-(t-time_input)*(t-time_input)/(sigma*sigma));
 </vector>
-<!−−The CDATA section gives the C code version of what equations of motion
-describes.−−>
+<!--The CDATA section gives the C code version of what equations of motion
+describes.-->
 <vector>
-<name> cross </name>
+<name>cross</name>
 <type> complex </type>
-<components> alpha12alpha13 </components>
+<components> alpha12 alpha13 </components>
 <![CDATA[
 alpha12 = 0.0; //atomic coherence
 alpha13 = 0.0; //atomic coherence
 ]]>
 </vector>
 </field>
-<!−−In the sequence section we tell xmds how to actually perform the integration
+<!--In the sequence section we tell xmds how to actually perform the integration
 of the field. It may have as many of the other sub-elements as desired to perform the
 calculation. An algorithm tag is optional and will default to SIEX for stocastic simulations
 and to RK4EX for non-stochastic simulations. The length of the integration interval, the
 total number of steps to take, and the number of samples for each output moment to take
 within these steps are denoted by the < interval >, < lattice > and < samples > tags
 respectively. The differential equation is described in terms of the C language code that
-xmds is to use to evolve the solution forward−−>
+xmds is to use to evolve the solution forward-->
 <sequence>
 <integrate>
 <algorithm> RK4EX </algorithm>
 <interval> sample_length </interval>
 <lattice> 800 </lattice>
 <samples> 400 400 </samples>
-<vectors> maincross </vectors>
+<vectors>main cross</vectors>
 <![CDATA[
-dE_dz = i ∗ g ∗ N ∗ (alpha13);
+dE_dz=i*g*N*(alpha13);
 ]]>
 <cross_propagation>
-<vectors> cross </vectors>
+<vectors>cross</vectors>
 <prop_dim> t </prop_dim>
 <![CDATA[
-double sw = (t < timeswitchz ? −1.0:1.0);
-dalpha13_dt = (−1.0 ∗ gama − 1.0 ∗ gama0/2 − gamac/2 − i ∗ delta) ∗ alpha13 + i ∗ g ∗
-E + i ∗ (omc) ∗ alpha12;
-dalpha12_dt = (−1.0 ∗ gama0 − gamac − i ∗ (sw ∗ eta ∗ (z − sample_length/2) + (omc ∗
-omc)/delta)) ∗ alpha12 + i ∗ alpha13 ∗ (omc);
+double sw = (t < timeswitchz ? -1.0:1.0);
+dalpha13_dt =(-1.0*gama-1.0*gama0/2-gamac/2-i*delta)*alpha13+i*g*E+i*(omc)*alpha12;
+dalpha12_dt = (-1.0 * gama0 - gamac - i * (sw * eta * (z - sample_length/2) + (omc *omc)/delta)) * alpha12 + i * alpha13 * (omc);
 ]]>
 </cross_propagation>
 </integrate>
 </sequence>
-<!−−Output element: The < output > element is just a container for the other tags
+<!--Output element: The < output > element is just a container for the other tags
 that specify what is to be output. The < f ilename > tag (fairly obviously) specifies the
 filename of the output data file. This tag is optional and defaults to the simulation name.
 The < group > tag contains a description (and to a degree the definition) of the moments
-of the output data. −−>
-<outputformat = "binary">
+of the output data. -->
+<output format="binary">
 <group>
 <sampling>
 <type> complex </type>
-<lattice> 400 </lattice><!−−fort−−>
+<lattice> 400 </lattice><!--fort-->
 <moments> probereal probeimag coupling </moments>
 <![CDATA[
 probereal = real(E);
@@ -104,9 +102,9 @@ probeimag = imag(E);
 </group>
 <group>
 <sampling>
-<vectors> maincross </vectors>
+<vectors>main cross</vectors>
 <type> complex </type>
-<lattice> 400 </lattice><!−−fort−−>
+<lattice> 400 </lattice><!--fort-->
 <moments> alpreal12 alpimag12 alpreal13 alpimag13 </moments>
 <![CDATA[
 alpreal12 = real(alpha12);
